@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=at-webserver
 PKG_VERSION:=0.1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_BUILD_DEPENDS:=rust/host
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -16,7 +16,13 @@ define Package/at-webserver
   CATEGORY:=Network
   TITLE:=AT Command WebSocket Server (Rust)
   # 必须引入 ca-bundle，否则使用 rustls 请求外部 https 时会因为找不到根证书报错
-  DEPENDS:=$(RUST_ARCH_DEPENDS) +ca-bundle +kmod-usb-net-cdc-ether +kmod-usb-net-cdc-ncm +kmod-usb-net-huawei-cdc-ncm
+  # kmod-usb-serial-option 会由 OpenWrt 自动带入 usbserial 和 usb_wwan 依赖
+  # kmod-usb-net-cdc-ether 提供 USB CDC ECM 网卡驱动支持
+  DEPENDS:=$(RUST_ARCH_DEPENDS) +ca-bundle \
+    +kmod-usb-serial-option \
+    +kmod-usb-net-cdc-ether \
+    +kmod-usb-net-cdc-ncm \
+    +kmod-usb-net-huawei-cdc-ncm
 endef
 
 define Package/at-webserver/description
